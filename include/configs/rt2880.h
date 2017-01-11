@@ -129,6 +129,11 @@ extern unsigned int  CFG_BLOCKSIZE;
 
 #include <cmd_confdefs.h>
 
+/* Local modification: I need more stuff */
+#undef CONFIG_COMMANDS
+#define CONFIG_COMMANDS (CONFIG_CMD_DFL | CFG_CMD_USB | CFG_CMD_FAT | \
+			 CFG_CMD_DHCP | CFG_CMD_LOADS)
+
 /*
  * Miscellaneous configurable options
  */
