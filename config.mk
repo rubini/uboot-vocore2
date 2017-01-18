@@ -80,7 +80,7 @@ endif
 ##############################
 # Decompression Algorithm
 ##############################
-CONFIG_GZIP = OFF
+CONFIG_GZIP = ON
 CONFIG_BZIP2 = OFF
 CONFIG_LZMA = ON
 CONFIG_XZ = OFF
