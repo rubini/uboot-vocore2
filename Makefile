@@ -241,7 +241,7 @@ u-boot.hex:	u-boot
 
 
 u-boot.srec:	u-boot
-		$(OBJCOPY) ${OBJCFLAGS} -O srec $< $@
+		$(OBJCOPY) ${OBJCFLAGS} -R .note.gnu.build-id -O srec $< $@
 
 ifeq ($(MT7621_MP), y)
 ifeq ($(CFG_ENV_IS), IN_NAND)
@@ -294,7 +294,7 @@ endif
 endif
 
 uboot.bin:	u-boot
-		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+		$(OBJCOPY) ${OBJCFLAGS} -R .note.gnu.build-id -O binary $< $@
 
 ifneq ($(MT7621_MP), y)
 uboot.img:	uboot.bin
