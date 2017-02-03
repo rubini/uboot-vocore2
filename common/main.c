@@ -43,7 +43,6 @@ extern int do_bootd (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 
 #define MAX_DELAY_STOP_STR 32
 
-static char * delete_char (char *buffer, char *p, int *colp, int *np, int plen);
 static int parse_line (char *, char *[]);
 #if defined(CONFIG_BOOTDELAY) && (CONFIG_BOOTDELAY >= 0)
 static int abortboot(int);
@@ -57,10 +56,6 @@ extern char console_buffer[CFG_CBSIZE];		/* console I/O buffer	*/
 #ifdef CONFIG_CMD_HISTORY
 #define     HISTORY_SIZE	10
 char 		console_history[HISTORY_SIZE][CFG_CBSIZE];
-static  int	history_cur_idx = -1;
-static  int	history_last_idx = -1;
-static  int history_counter = 0;
-static  int history_enable = 0;
 #endif
 
 #ifdef CONFIG_BOOT_RETRY_TIME

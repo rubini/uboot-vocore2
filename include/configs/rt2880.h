@@ -34,8 +34,6 @@
 
 #define CONFIG_NET_MULTI
 
-#define CONFIG_WEBGPIO 38
-
 #define CONFIG_LED 44
 
 #define CONFIG_BAUDRATE	115200

@@ -408,8 +408,6 @@ extern void flash_read_factory_serial(flash_info_t * info, void * buffer, int of
 #define FLASH_S29GL064M 0x00F0		/* Spansion S29GL064M-R6		*/
 #define FLASH_S29GL256N 0x227E		/* Spansion S29GL256N			*/
 
-#define FLASH_UNKNOWN	0xFFFF		/* unknown flash type			*/
-
 
 /* manufacturer offsets
  */
