@@ -27,6 +27,8 @@
 #undef DEBUG
 #endif 
 
+extern void wait_ms(unsigned long ms);
+
 #include <common.h>
 #include <asm/byteorder.h>
 #include <usb.h>
