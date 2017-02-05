@@ -47,7 +47,7 @@ export	TOPDIR
 ifeq ($(MT7621_MP), y)
 CONFIG_CROSS_COMPILER_PATH ?= /opt/mips-2012.03/bin/
 else
-CONFIG_CROSS_COMPILER_PATH ?= $(CURDIR)/toolchain/bin
+CONFIG_CROSS_COMPILER_PATH = $(CURDIR)/toolchain/bin
 endif
 
 ifeq (include/config.mk,$(wildcard include/config.mk))
@@ -57,7 +57,6 @@ export	ARCH CPU BOARD VENDOR SOC
 # load other configuration
 include $(TOPDIR)/config.mk
 
-ifndef CROSS_COMPILE
 ifeq ($(HOSTARCH),ppc)
 CROSS_COMPILE =
 else
@@ -88,7 +87,6 @@ CROSS_COMPILE = $(CONFIG_CROSS_COMPILER_PATH)/m68k-elf-
 endif
 ifeq ($(ARCH),microblaze)
 CROSS_COMPILE = $(CONFIG_CROSS_COMPILER_PATH)/mb-
-endif
 endif
 endif
 
