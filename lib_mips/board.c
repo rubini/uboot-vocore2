@@ -33,6 +33,8 @@
 #include <spi_api.h>
 #include <nand_api.h>
 
+extern int do_load_serial_bin (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
+
 DECLARE_GLOBAL_DATA_PTR;
 #undef DEBUG
 
@@ -127,7 +129,7 @@ static char  file_name_space[ARGV_LEN];
         __res;})
 
 #if defined (CONFIG_DDR_CAL)
-__attribute__((nomips16)) void dram_cali(void);
+void dram_cali(void);
 #endif
 
 static void Init_System_Mode(void)
@@ -602,7 +604,7 @@ init_fnc_t *init_sequence[] = {
 #endif
 
 //  
-__attribute__((nomips16)) void board_init_f(ulong bootflag)
+void board_init_f(ulong bootflag)
 {
 	gd_t gd_data, *id;
 	bd_t *bd;  
@@ -944,6 +946,8 @@ __attribute__((nomips16)) void board_init_f(ulong bootflag)
 #define LED0A_MODE_MASK	0x0000000C
 #define WLEDA_MODE_MASK	0x00000003
 
+#undef ra_inl
+#undef ra_outl
 #define ra_inl(addr)  (*(volatile u32 *)(addr))
 #define ra_outl(addr, value)  (*(volatile u32 *)(addr) = (value))
 #define ra_and(addr, value) ra_outl(addr, (ra_inl(addr) & (value)))
@@ -969,7 +973,7 @@ void led_off(void){
 //	printf("led is off\n");
 }
 
-int reset_button_enable(){
+int reset_button_enable(int unused){
 	/* set gpio 38 as input with inverted polarity*/
 	if (webgpio == 38){
 		ra_or(GPIO_SYSCTL + GPIO1_MODE,(0x00000001 << 14) );
@@ -984,7 +988,7 @@ int reset_button_enable(){
 	}
 }	
 
-int reset_button_status(){
+int reset_button_status(int unused){
 	unsigned reg = 0x00000000;
 	if (webgpio == 38){
 	/* read gpio 38 */
@@ -1423,7 +1427,7 @@ int check_image_validation(void)
 
 gd_t gd_data;
  
-__attribute__((nomips16)) void board_init_r (gd_t *id, ulong dest_addr)
+void board_init_r (gd_t *id, ulong dest_addr)
 {
 	cmd_tbl_t *cmdtp;
 	ulong size;
@@ -1532,7 +1536,7 @@ __attribute__((nomips16)) void board_init_r (gd_t *id, ulong dest_addr)
 	config_usb_mtk_xhci();
 #endif
 #if defined (MT7620_ASIC_BOARD) || defined (MT7628_ASIC_BOARD)
-	void disable_pcie();
+	void disable_pcie(void);
 	disable_pcie();
 #endif
 
@@ -3129,7 +3133,7 @@ static inline void cal_memset(void* src, unsigned char pat, unsigned int size)
 	:								\
 	: "i" (op), "R" (*(unsigned char *)(addr)))	
 	
-__attribute__((nomips16)) static void inline cal_invalidate_dcache_range(ulong start_addr, ulong stop)
+static void inline cal_invalidate_dcache_range(ulong start_addr, ulong stop)
 {
 	unsigned long lsize = CONFIG_SYS_CACHELINE_SIZE;
 	unsigned long addr = start_addr & ~(lsize - 1);
@@ -3159,7 +3163,7 @@ static void inline cal_patgen(unsigned long* start_addr, unsigned int size, unsi
 #define MAX_FINE_START	0x0
 #define cal_debug debug
 								
-__attribute__((nomips16)) void dram_cali(void)
+void dram_cali(void)
 {
 #if defined(ON_BOARD_64M_DRAM_COMPONENT)
 	#define DRAM_BUTTOM 0x800000	
@@ -3188,10 +3192,7 @@ __attribute__((nomips16)) void dram_cali(void)
 	unsigned int max_fine_dqs[2];
 	unsigned int coarse_dqs[2];
 	unsigned int fine_dqs[2];
-	unsigned int min_dqs[2];
-	unsigned int max_dqs[2];
 	int reg = 0, ddr_cfg2_reg = 0;
-	int ret = 0;
 	int flag = 0, min_failed_pos[2], max_failed_pos[2], min_fine_failed_pos[2], max_fine_failed_pos[2];
 	int i,j, k;
 	int dqs = 0;
@@ -3201,7 +3202,7 @@ __attribute__((nomips16)) void dram_cali(void)
 	unsigned int cache_pat[8*40];
 #endif	
 	u32 value, test_count = 0;;
-	u32 fdiv = 0, step = 0, frac = 0;
+	u32 fdiv = 0, frac = 0;
 
 	value = RALINK_REG(RALINK_DYN_CFG0_REG);
 	fdiv = (unsigned long)((value>>8)&0x0F);
@@ -3238,7 +3239,6 @@ __attribute__((nomips16)) void dram_cali(void)
 	ddr_cfg2_reg = RALINK_REG(RALINK_MEMCTRL_BASE+0x48);
 	RALINK_REG(RALINK_MEMCTRL_BASE+0x48)&=(~((0x3<<28)|(0x3<<26)));
 
-TEST_LOOP:
 	min_coarse_dqs[0] = MIN_START;
 	min_coarse_dqs[1] = MIN_START;
 	min_fine_dqs[0] = MIN_FINE_START;
@@ -3507,7 +3507,6 @@ MIN_FAILED:
 	test_count++;
 	
 	
-FINAL:
 		for (j = 0; j < 2; j++)	
 			cal_debug("[%02X%02X%02X%02X]",min_coarse_dqs[j],min_fine_dqs[j], max_coarse_dqs[j],max_fine_dqs[j]);
 		cal_debug("\nDDR Calibration DQS reg = %08X\n",reg);

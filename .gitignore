@@ -1,0 +1,12 @@
+*.o
+*.a
+*~
+.depend
+System.map
+u-boot
+u-boot.map
+u-boot.srec
+uboot.bin
+uboot.img
+tools/mkimage
+httpd/fsdata.c

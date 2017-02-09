@@ -25,17 +25,17 @@
 
 extern unsigned long mips_cpu_feq;
 
-__attribute__((nomips16)) static void mips_compare_set(u32 v)
+static void mips_compare_set(u32 v)
 {
 	asm volatile ("mtc0 %0, $11" : : "r" (v));
 }
 
-__attribute__((nomips16)) static void  mips_count_set(u32 v)
+static void  mips_count_set(u32 v)
 {
 	asm volatile ("mtc0 %0, $9" : : "r" (v));
 }
 
-__attribute__((nomips16)) static u32 mips_count_get(void)
+static u32 mips_count_get(void)
 {
 	u32 count;
 
@@ -46,7 +46,7 @@ __attribute__((nomips16)) static u32 mips_count_get(void)
 /*
  * timer without interrupts
  */
-__attribute__((nomips16)) int timer_init(void)
+int timer_init(void)
 {
 	
 	mips_compare_set(0);
@@ -56,14 +56,14 @@ __attribute__((nomips16)) int timer_init(void)
 }
 
 
-__attribute__((nomips16)) ulong get_timer(ulong base)
+ulong get_timer(ulong base)
 {
 	//printf("%s = %x\n", __FUNCTION__, mips_count_get() );
 	return mips_count_get() - base;
 }
 
 
-__attribute__((nomips16)) void udelay (unsigned long usec)
+void udelay (unsigned long usec)
 {
 	ulong tmo;
 	ulong start = get_timer(0);
@@ -73,7 +73,7 @@ __attribute__((nomips16)) void udelay (unsigned long usec)
 		/*NOP*/;
 }
 
-__attribute__((nomips16)) void mdelay(unsigned long msec)
+void mdelay(unsigned long msec)
 {
 	while (msec--)
 		udelay(1000);

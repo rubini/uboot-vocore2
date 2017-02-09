@@ -1,5 +1,5 @@
 /* FIXME: Only this does work for u-boot... find out why... [RS] */
-#define MT7628_ASIC_BOARD
+//#define MT7628_ASIC_BOARD -- symbol already defined in autoconf.h 
 
 # undef	io_p2v
 # undef __REG

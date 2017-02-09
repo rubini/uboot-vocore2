@@ -30,6 +30,7 @@
 #include <image.h>
 #include <malloc.h>
 #include <rt_mmap.h>
+#include <spi_api.h>
 
 #include <environment.h>
 #include <asm/byteorder.h>

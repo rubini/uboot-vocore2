@@ -1389,6 +1389,7 @@ NetReceive(volatile uchar * inpkt, int len)
 				 * immediately */
 				extern int TftpStarted;
 				if(TftpStarted == 1) {
+				    extern void TftpSend(void);
 				    TftpSend ();
 				}
 			}

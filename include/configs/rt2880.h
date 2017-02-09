@@ -34,8 +34,6 @@
 
 #define CONFIG_NET_MULTI
 
-#define CONFIG_WEBGPIO 38
-
 #define CONFIG_LED 44
 
 #define CONFIG_BAUDRATE	115200
@@ -68,6 +66,9 @@ extern unsigned int  CFG_BLOCKSIZE;
 #endif
 
 #include "../../autoconf.h"
+#ifdef UBOOT_RAM
+#define CFG_RUN_CODE_IN_RAM 1
+#endif
 #define DEBUG				1
 //#define ET_DEBUG
 #define CONFIG_RT2880_ETH		1	/* Enable built-in 10/100 Ethernet */

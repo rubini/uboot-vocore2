@@ -1764,7 +1764,7 @@ void rt6855A_eth_gpio_reset(void)
 void mt7628_ephy_init(void)
 {
 	int i;
-	u32 phy_val;
+	//u32 phy_val;
 	mii_mgr_write(0, 31, 0x2000);//change G2 page
 	mii_mgr_write(0, 26, 0x0000);
 
@@ -2811,12 +2811,9 @@ Done:
 
 static int rt2880_eth_recv(struct eth_device* dev)
 {
-	int length = 0,hdr_len=0,bb=0;
+	int length = 0,hdr_len=0;
 	int inter_loopback_cnt =0;
 	u32 *rxd_info;
-#if !defined (RT3883_FPGA_BOARD) && !defined (RT3883_ASIC_BOARD)
-	u8 temp_mac[6];
-#endif
 
 	for (; ; ) {
 		rxd_info = (u32 *)KSEG1ADDR(&rx_ring[rx_dma_owner_idx0].rxd_info2);

@@ -47,7 +47,7 @@ export	TOPDIR
 ifeq ($(MT7621_MP), y)
 CONFIG_CROSS_COMPILER_PATH ?= /opt/mips-2012.03/bin/
 else
-CONFIG_CROSS_COMPILER_PATH ?= $(CURDIR)/toolchain/bin
+CONFIG_CROSS_COMPILER_PATH = $(CURDIR)/toolchain/bin
 endif
 
 ifeq (include/config.mk,$(wildcard include/config.mk))
@@ -57,7 +57,6 @@ export	ARCH CPU BOARD VENDOR SOC
 # load other configuration
 include $(TOPDIR)/config.mk
 
-ifndef CROSS_COMPILE
 ifeq ($(HOSTARCH),ppc)
 CROSS_COMPILE =
 else
@@ -88,7 +87,6 @@ CROSS_COMPILE = $(CONFIG_CROSS_COMPILER_PATH)/m68k-elf-
 endif
 ifeq ($(ARCH),microblaze)
 CROSS_COMPILE = $(CONFIG_CROSS_COMPILER_PATH)/mb-
-endif
 endif
 endif
 
@@ -241,7 +239,7 @@ u-boot.hex:	u-boot
 
 
 u-boot.srec:	u-boot
-		$(OBJCOPY) ${OBJCFLAGS} -O srec $< $@
+		$(OBJCOPY) ${OBJCFLAGS} -R .note.gnu.build-id -O srec $< $@
 
 ifeq ($(MT7621_MP), y)
 ifeq ($(CFG_ENV_IS), IN_NAND)
@@ -294,7 +292,7 @@ endif
 endif
 
 uboot.bin:	u-boot
-		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+		$(OBJCOPY) ${OBJCFLAGS} -R .note.gnu.build-id -O binary $< $@
 
 ifneq ($(MT7621_MP), y)
 uboot.img:	uboot.bin

@@ -264,7 +264,7 @@ reset:
     defined (MT7628_FPGA_BOARD) || defined (MT7628_ASIC_BOARD)
 	# Initialize the register file
 	# should not be required with good software practices
-	or	$1,$0, $0
+	nop /* or	$1,$0, $0 */
 	or	$2,$0, $0
 	or	$3,$0, $0
 	or	$4,$0, $0
@@ -2971,7 +2971,6 @@ DDR2_CFG4_TBL:
 #if (TEXT_BASE == 0xBFC00000) || (TEXT_BASE == 0xBF000000) || (TEXT_BASE == 0xBC000000)
 #if defined (CONFIG_DDR_CAL)
 		/* === lock d$ === */	
-		.globl	lock_dcache
 		.ent	lock_dcache
 lock_dcache:
 		lui	$14, 0x8900		# Get a KSeg0 address for cacheops
@@ -3004,7 +3003,6 @@ lock_dcache:
 		.end	lock_dcache
 		
 		/* === unlock d$ === */	
-		.globl	unlock_dcache
 		.ent	unlock_dcache
 unlock_dcache:
 		lui	$14, 0x8000		# Get a KSeg0 address for cacheops
@@ -3032,7 +3030,6 @@ unlock_dcache:
 		.end	unlock_dcache
 
 		/* === fill I$ === */			
-		.globl	fill_icache
 		.ent	fill_icache
 fill_icache:
 		lui		$14, %hi(dram_cali)		# Get a KSeg0 address for cacheops

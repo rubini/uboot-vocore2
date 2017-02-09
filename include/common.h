@@ -234,8 +234,8 @@ void	init_cmd_timeout(void);
 void	reset_cmd_timeout(void);
 
 /* lib_$(ARCH)/board.c */
-__attribute__((nomips16)) void	board_init_f  (ulong);
-__attribute__((nomips16)) void	board_init_r  (gd_t *, ulong);
+void	board_init_f  (ulong);
+void	board_init_r  (gd_t *, ulong);
 int	checkboard    (void);
 int	checkflash    (void);
 int	checkdram     (void);
@@ -523,7 +523,7 @@ void	external_interrupt (struct pt_regs *);
 void	irq_install_handler(int, interrupt_handler_t *, void *);
 void	irq_free_handler   (int);
 void	reset_timer	   (void);
-__attribute__((nomips16)) ulong	get_timer	   (ulong base);
+ulong	get_timer	   (ulong base);
 void	set_timer	   (ulong t);
 void	enable_interrupts  (void);
 int	disable_interrupts (void);
@@ -553,7 +553,7 @@ ulong	vfd_setmem (ulong);
 ulong	video_setmem (ulong);
 
 /* lib_$(ARCH)/cache.c */
-__attribute__((nomips16)) void	flush_cache   (unsigned long, unsigned long);
+void	flush_cache   (unsigned long, unsigned long);
 
 
 /* lib_$(ARCH)/ticks.S */
@@ -561,7 +561,7 @@ unsigned long long get_ticks(void);
 void	wait_ticks    (unsigned long);
 
 /* lib_$(ARCH)/time.c */
-__attribute__((nomips16)) void	udelay	      (unsigned long);
+void	udelay	      (unsigned long);
 ulong	usec2ticks    (unsigned long usec);
 ulong	ticks2usec    (unsigned long ticks);
 int	init_timebase (void);

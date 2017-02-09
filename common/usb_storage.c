@@ -55,6 +55,8 @@
 #include <asm/addrspace.h>
 #include <asm/byteorder.h>
 
+extern void wait_ms(unsigned long ms);
+
 
 #if (CONFIG_COMMANDS & CFG_CMD_USB)
 #include <usb.h>
