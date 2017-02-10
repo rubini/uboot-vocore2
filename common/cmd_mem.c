@@ -1000,104 +1000,21 @@ U_BOOT_CMD(
 
 #endif /* CONFIG_COMMANDS & CFG_CMD_MEMORY */
 
-#ifdef CFG_ENV_IS_IN_FLASH
+#if 1 //def CFG_ENV_IS_IN_FLASH
 int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	ulong	addr = 0, dest = 0, count = 0;
 	int	size;
 
-	if(!memcmp(argv[0],"cp.linux",sizeof("cp.linux")))
-	{
-/* 8M/16 flash:
- *  -write linux kernel and file system separately
- *  -kernel starts at PHYS_FLASH_1 and file system starts at PHYS_FLASH_2
- */
-#if (defined (RT2880_ASIC_BOARD) || defined (RT2880_FPGA_BOARD) || defined (RT3052_MP1)) && (defined ON_BOARD_8M_FLASH_COMPONENT || defined ON_BOARD_16M_FLASH_COMPONENT)
-		int rc;
-		ulong kernsz = 0x3B0000;
-
-		addr += base_address;
-		addr += CFG_LOAD_ADDR;
-		dest = dest + CFG_KERN_ADDR + base_address;
-		if (NetBootFileXferSize <= kernsz)
-			count = NetBootFileXferSize;
-		else
-			count = kernsz;
-		size = 1;
-
-		printf("\n Copy linux image[%d byte] to Flash[0x%08X].... \n",count,dest);
-		puts ("Copy to Flash... ");
-		printf ("\n Copy %d bytes to Flash... ", count);
-
-		rc = flash_write ((uchar *)addr, dest, count);
-		if (rc != 0) {
-			flash_perror (rc);
-			return (1);
-		}
-		if (count < kernsz)
-			return 0;
-
-		addr += kernsz;
-		dest = PHYS_FLASH_2;
-		count = NetBootFileXferSize - kernsz;
-		printf("\n Copy linux file system[%d byte] to Flash[0x%08X].... \n",count,dest);
-		puts ("Copy to Flash... ");
-		printf ("\n Copy %d bytes to Flash... ", count);
-
-		rc = flash_write ((uchar *)addr, dest, count);
-		if (rc != 0) {
-			flash_perror (rc);
-			return (1);
-		}
-
-		puts ("done\n");
-		return 0;
-#endif
-		addr += base_address;
-		addr += CFG_LOAD_ADDR;
-		dest = dest + CFG_KERN_ADDR + base_address;
-		printf("\n Copy linux image[%d byte] to Flash[0x%08X].... \n",NetBootFileXferSize,dest);
-		count = NetBootFileXferSize;
-		size = 1;
-		goto RT2880_START_WRITE_FLASH;
-	}
-/* flash layout remove cramfs, by bruce */
-/*
-	else if(!memcmp(argv[0],"cp.cramfs",sizeof("cp.cramfs")))
-	{
-		addr += base_address;
-		addr += CFG_LOAD_ADDR;
-		dest = dest + 0xBC530000 + base_address;
-		printf("\n Copy File System image[%d byte] to Flash[0x%08X].... \n",NetBootFileXferSize,dest);
-		
-		count = NetBootFileXferSize;
-		size = 1;
-		goto RT2880_START_WRITE_FLASH;
-	}
-*/
-	else if(!memcmp(argv[0],"cp.uboot",sizeof("cp.uboot")))
-	{
-		addr += base_address;
-		addr += CFG_LOAD_ADDR;
-		dest = dest + CFG_FLASH_BASE + base_address;
-		printf("\n Copy uboot[%d byte] to Flash[0x%08X].... \n",NetBootFileXferSize,dest);
-		
-		count = NetBootFileXferSize;
-		size = 1;
-		goto RT2880_START_WRITE_FLASH;
-	}
-	
 	if (argc != 4) {
 		printf ("Usage:\n%s\n", cmdtp->usage);
 		return 1;
 	}
-	
-	/* Check for size specification. */
+
+	/* Check for size specification.
+	*/
 	if ((size = cmd_get_data_size(argv[0], 4)) < 0)
-	{
-		puts (" cmd error\n");
 		return 1;
-	}	
 
 	addr = simple_strtoul(argv[1], NULL, 16);
 	addr += base_address;
@@ -1107,108 +1024,10 @@ int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 	count = simple_strtoul(argv[3], NULL, 16);
 
-RT2880_START_WRITE_FLASH:
-		
 	if (count == 0) {
 		puts ("Zero length ???\n");
 		return 1;
 	}
-
-#ifndef CFG_NO_FLASH
-	/* check if we are copying to Flash */
-	if ( (addr2info(dest) != NULL)
-#ifdef CONFIG_HAS_DATAFLASH
-	   && (!addr_dataflash(addr))
-#endif
-	   ) {
-		int rc;
-
-		puts ("Copy to Flash... ");
-		printf ("\n Copy %d byte to Flash... ",count*size);
-
-		rc = flash_write ((uchar *)addr, dest, count*size);
-		if (rc != 0) {
-			flash_perror (rc);
-			return (1);
-		}
-		puts ("done\n");
-		return 0;
-	}
-#endif
-
-#if (CONFIG_COMMANDS & CFG_CMD_MMC)
-	if (mmc2info(dest)) {
-		int rc;
-
-		puts ("Copy to MMC... ");
-		switch (rc = mmc_write ((uchar *)addr, dest, count*size)) {
-		case 0:
-			putc ('\n');
-			return 1;
-		case -1:
-			puts ("failed\n");
-			return 1;
-		default:
-			printf ("%s[%d] FIXME: rc=%d\n",__FILE__,__LINE__,rc);
-			return 1;
-		}
-		puts ("done\n");
-		return 0;
-	}
-
-	if (mmc2info(addr)) {
-		int rc;
-
-		puts ("Copy from MMC... ");
-		switch (rc = mmc_read (addr, (uchar *)dest, count*size)) {
-		case 0:
-			putc ('\n');
-			return 1;
-		case -1:
-			puts ("failed\n");
-			return 1;
-		default:
-			printf ("%s[%d] FIXME: rc=%d\n",__FILE__,__LINE__,rc);
-			return 1;
-		}
-		puts ("done\n");
-		return 0;
-	}
-#endif
-
-#ifdef CONFIG_HAS_DATAFLASH
-	/* Check if we are copying from RAM or Flash to DataFlash */
-	if (addr_dataflash(dest) && !addr_dataflash(addr)){
-		int rc;
-
-		puts ("Copy to DataFlash... ");
-
-		rc = write_dataflash (dest, addr, count*size);
-
-		if (rc != 1) {
-			dataflash_perror (rc);
-			return (1);
-		}
-		puts ("done\n");
-		return 0;
-	}
-
-	/* Check if we are copying from DataFlash to RAM */
-	if (addr_dataflash(addr) && !addr_dataflash(dest) && (addr2info(dest)==NULL) ){
-		int rc;
-		rc = read_dataflash(addr, count * size, (char *) dest);
-		if (rc != 1) {
-			dataflash_perror (rc);
-			return (1);
-		}
-		return 0;
-	}
-
-	if (addr_dataflash(addr) && addr_dataflash(dest)){
-		puts ("Unsupported combination of source/destination.\n\r");
-		return 1;
-	}
-#endif
 
 	while (count-- > 0) {
 		if (size == 4)

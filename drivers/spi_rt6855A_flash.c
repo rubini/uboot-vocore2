@@ -1505,44 +1505,6 @@ unsigned int atox(char* s)
 }
 
 
-int do_mem_cp(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
-{
-	unsigned int addr, dest;
-	int count;
-
-	addr = CFG_LOAD_ADDR;
-	count = (unsigned int)NetBootFileXferSize;
-	if(count == 0) {
-		count = atox(argv[1]);
-	}
-	if (!strncmp(argv[0], "cp.linux", 9)) {
-		dest = CFG_KERN_ADDR - CFG_FLASH_BASE;
-		printf("\n Copy linux image[%d byte] to SPI Flash[0x%08X].... \n", count, dest);
-	}
-	else if (!strncmp(argv[0], "cp.uboot", 9)) {
-		dest = 0;
-		printf("\n Copy uboot[%d byte] to SPI Flash[0x%08X].... \n", count, dest);
-	}
-	else if (!strncmp(argv[0], "cp.weblinux", 9)) {
-		addr = WEBFAILSAFE_UPLOAD_RAM_ADDRESS;
-		dest = CFG_KERN_ADDR - CFG_FLASH_BASE;
-		printf("\n Copy linux image from web [%d byte] to SPI Flash[0x%08X]... \n", count, dest);
-	}
-	else {
-		printf ("Usage:\n%s\n", cmdtp->usage);
-		return 1;
-	}
-	
-	raspi_write((char *)addr, dest, count);
-	return 0;
-}
-
-U_BOOT_CMD(
-	cp,	2,	1,	do_mem_cp,
-	"cp      - memory copy\n",
-	"\ncp.uboot\n    - copy uboot block\n"
-	"cp.linux\n    - copy linux kernel block\n"
-);
 
 int do_flerase (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
