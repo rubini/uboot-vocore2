@@ -885,7 +885,9 @@ void board_init_f(ulong bootflag)
 }
 
 #define SEL_BOOT_USB			0
-#define SEL_BOOT_INITRAMFS		1
+#define SEL_BOOT_MMC			1
+#define SEL_BOOT_UBI			2
+#define SEL_BOOT_SH			3
 #define SEL_ENTER_CLI                   4
 
 
@@ -1008,9 +1010,14 @@ void OperationSelect(void)
 	led_enable();
 	led_on();
 	printf("\nPlease choose the operation: \n");
-	printf("   %d: Boot mounting usb partition 2 (/dev/sda2)\n",
+	printf("   %d: Boot mounting USB partition 2\n",
 	       SEL_BOOT_USB);
-	printf("   %d: Boot with initramfs\n", SEL_BOOT_INITRAMFS);
+	printf("   %d: Boot mounting MMC/SDcard partition 2\n",
+	       SEL_BOOT_MMC);
+	printf("   %d: Boot mounting UBI filesystem\n",
+	       SEL_BOOT_UBI);
+	printf("   %d: Debug boot: run sh in initramfs\n",
+	       SEL_BOOT_SH);
 #ifdef RALINK_CMDLINE
 	printf("   %d: Entr boot command line interface.\n", SEL_ENTER_CLI);
 #endif // RALINK_CMDLINE //
@@ -2115,7 +2122,7 @@ void board_init_r (gd_t *id, ulong dest_addr)
 		printf ("\b\b\b\b%2d ", timer1);
 	}
 	putc ('\n');
-	if(BootType == '3') {
+	if(0) {
 		char *argv[2];
 		sprintf(addr_str, "0x%X", CFG_KERN_ADDR);
 		argv[1] = &addr_str[0];
@@ -2133,18 +2140,48 @@ void board_init_r (gd_t *id, ulong dest_addr)
 		eth_initialize(gd->bd);
 #endif
 
+		/* Common stuff for the three types of boot */
+		#define INITRD_ARGS "rd_start=0x86000000 rd_size=2000000"
+		argv[1] = "0xbc050000";
+
+		/* copy the initramfs too (we *know* the address) and size */
+		{
+			int *dst = 0x86000000;
+			int *src = 0xbc280000;
+			int len = (0xbc400000 - (int)src) / 4;
+			/* string.c::memcpy() is 8-bit wide: very slow */
+			while (len--)
+				*dst++ = *src++;
+		}
+
 		switch(BootType) {
 		case '0':
-			printf("   \n%d: Booting kernel, mounting /dev/sda2",
+			printf("%d: Booting kernel, prefer USB\n",
 			       SEL_BOOT_USB);
-			setenv("bootargs", "root=/dev/sda2 rootwait");
-			argv[1] = "0xbc080000";
+			setenv("bootargs", INITRD_ARGS " USE=usb");
 			do_bootm(cmdtp, 0, 2, argv);
 			break;
 
 		case '1':
-			printf("FIXME\n");
-			/* fall through */
+			printf("%d: Booting kernel, prefer MMC/SDcard\n",
+			       SEL_BOOT_MMC);
+			setenv("bootargs", INITRD_ARGS " USE=mmc");
+			do_bootm(cmdtp, 0, 2, argv);
+			break;
+
+		case '2':
+			printf("%d: Booting kernel, prefer UBI storage\n",
+			       SEL_BOOT_USB);
+			setenv("bootargs", INITRD_ARGS " USE=ubi");
+			do_bootm(cmdtp, 0, 2, argv);
+			break;
+
+		case '3':
+			printf("%d: Booting kernel, shell in initrd\n",
+			       SEL_BOOT_SH);
+			setenv("bootargs", INITRD_ARGS " USE=sh");
+			do_bootm(cmdtp, 0, 2, argv);
+			break;
 
 		default: /* '4' etc */
 			printf("System Enter Boot Command Line Interface.\n");
