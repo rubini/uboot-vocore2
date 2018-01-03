@@ -2087,7 +2087,7 @@ void board_init_r (gd_t *id, ulong dest_addr)
 	OperationSelect();   
 	web_enabled = 0;
 	int led_is_on = 1;
-	int led_rate = 40;
+	int led_rate = 10; /* 100ms on, 100ms off */
 	s = getenv("gpioenabled");
 	if ( strcmp(s,"yes") == 0 ){
 		/* disabled */
