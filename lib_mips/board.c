@@ -448,6 +448,7 @@ static void Init_System_Mode(void)
 	 * 7.8us * 106.7Mhz(SDRAM clock) = 832
 	 * the value of refresh cycle shall smaller than 832. 
 	 * so we config it at 0x300 (suggested by ASIC)
+	 * or, better, half of it because of temperature (so 0x180)
 	 */
 #if defined(ON_BOARD_SDR) && defined(ON_BOARD_256M_DRAM_COMPONENT) && (!defined(MT7620_ASIC_BOARD))
 	{
@@ -455,7 +456,7 @@ static void Init_System_Mode(void)
 	tREF = RALINK_REG(SDRAM_CFG1_REG);
 	tREF &= 0xffff0000;
 #if defined(ASIC_BOARD)
-	tREF |= 0x00000300;
+	tREF |= 0x00000180;
 #elif defined(FPGA_BOARD) 
 	tREF |= 0x000004B;
 #else
